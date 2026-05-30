@@ -1,0 +1,128 @@
+.workers-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.workers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.workers-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 0.5rem;
+}
+
+.workers-subtitle {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+.worker-form-card {
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+}
+
+.worker-form-card h3 {
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.workers-table-container {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.workers-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+}
+
+.workers-table th {
+  background-color: var(--color-surface-hover);
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.workers-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-main);
+}
+
+.workers-table tr:last-child td {
+  border-bottom: none;
+}
+
+.workers-table tr:hover {
+  background-color: rgba(37, 99, 235, 0.02);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.status-badge.inactive {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .workers-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .workers-header .btn {
+    width: 100%;
+  }
+
+  .workers-table-container {
+    overflow-x: auto;
+  }
+  
+  .workers-table {
+    min-width: 600px; /* Force scroll on small screens */
+  }
+}

@@ -1,0 +1,445 @@
+.reports-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.reports-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 0.5rem;
+}
+
+.reports-subtitle {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-actions .btn {
+  white-space: nowrap;
+}
+
+/* Filter Bar Styles */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  white-space: nowrap;
+}
+
+.filter-group .select-field {
+  min-width: 200px;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+}
+
+/* Table Styles */
+.reports-table-container {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+.reports-table th {
+  background-color: var(--color-surface-hover);
+  padding: 1.25rem 1rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.reports-table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  vertical-align: top;
+}
+
+.reports-table tr:last-child td {
+  border-bottom: none;
+}
+
+.reports-table tr:hover {
+  background-color: rgba(37, 99, 235, 0.02);
+}
+
+.worker-names {
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.production-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prod-badge {
+  display: inline-block;
+  background-color: var(--color-surface-hover);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-text-muted);
+}
+
+/* Mobile Responsive Tables using Cards approach */
+@media screen and (max-width: 1024px) {
+  .reports-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    flex: 1;
+  }
+
+  /* Force table to not behave like a table on mobile */
+  .reports-table, 
+  .reports-table thead, 
+  .reports-table tbody, 
+  .reports-table th, 
+  .reports-table td, 
+  .reports-table tr { 
+    display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  .reports-table thead tr { 
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  .reports-table tr { 
+    border: 1px solid var(--color-border);
+    margin-bottom: 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem;
+  }
+  
+  .reports-table td { 
+    /* Behave like a "row" */
+    border: none;
+    border-bottom: 1px dashed var(--color-border); 
+    position: relative;
+    padding: 0.75rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .reports-table td:last-child {
+    border-bottom: 0;
+    justify-content: flex-end;
+  }
+  
+  .reports-table td:before { 
+    /* Now like a table header */
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-align: right;
+    flex-shrink: 0;
+    width: 40%;
+  }
+
+  .production-details {
+    align-items: flex-end;
+  }
+}
+
+/* Print Styles for PDF Generation */
+.print-only-header,
+.print-only-footer {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0; /* Removing page margin hides browser default headers and footers like URL and page number */
+  }
+
+  body {
+    background-color: white;
+    color: black;
+    font-family: 'Tajawal', sans-serif;
+    padding: 1.5cm; /* Add padding to compensate for 0 page margin */
+    box-sizing: border-box;
+  }
+
+  .no-print,
+  .sidebar,
+  .top-bar {
+    display: none !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .reports-page {
+    gap: 1rem;
+    display: block;
+  }
+
+  .print-only-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .print-header-center {
+    text-align: center;
+    flex: 1;
+  }
+
+  .print-main-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    color: #000;
+  }
+
+  .print-sub-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin: 0 0 1rem 0;
+  }
+
+  .print-date-badge {
+    display: inline-block;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    color: #4b5563;
+    background-color: #f9fafb;
+    font-weight: 600;
+  }
+
+  .print-header-side {
+    width: 150px;
+  }
+
+  .print-logo-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    padding: 1.25rem 0.75rem;
+    text-align: center;
+    min-width: 140px;
+  }
+
+  .print-logo-box.primary-box {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-logo-box.primary-box .logo-box-icon {
+    color: #f59e0b;
+    font-size: 1.75rem;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+
+  .print-logo-box.primary-box .logo-box-name {
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: #ffffff;
+    margin-bottom: 0.2rem;
+  }
+
+  .print-logo-box.primary-box .logo-box-sub {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .print-logo-box.secondary-box {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 1px solid #cbd5e1;
+  }
+
+  .print-logo-box.secondary-box .logo-box-icon {
+    color: #4f46e5;
+    font-size: 1.75rem;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+
+  .print-logo-box.secondary-box .logo-box-name {
+    font-weight: 900;
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+  }
+
+  .print-logo-box.secondary-box .logo-box-sub {
+    font-size: 0.7rem;
+    color: #64748b;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .print-date-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 0.5rem;
+  }
+  .reports-table-container {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    margin-bottom: 3rem;
+  }
+
+  .reports-table {
+    border: 1px solid #cbd5e1;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .reports-table th,
+  .reports-table td {
+    border: 1px solid #cbd5e1;
+    padding: 1rem 0.85rem;
+    color: #1e293b;
+    text-align: right;
+    font-size: 0.95rem;
+  }
+
+  .reports-table th {
+    background-color: #f1f5f9 !important; /* Light professional background */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #94a3b8;
+  }
+
+  .print-only-footer {
+    display: block;
+    margin-top: 4rem;
+    padding-top: 2rem;
+  }
+
+  .print-signatures {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .signature-box {
+    text-align: center;
+    width: 300px;
+  }
+
+  .sig-title {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+
+  .sig-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #3b82f6; /* Subtle brand color for name */
+    margin-bottom: 1.5rem;
+  }
+
+  .sig-line {
+    font-size: 1rem;
+    color: #64748b;
+    border-top: 1px dashed #94a3b8;
+    padding-top: 0.5rem;
+    margin-top: 2.5rem;
+  }
+}
