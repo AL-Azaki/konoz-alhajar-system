@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, X, ChevronLeft, LogIn, Phone, Moon, Sun } from 'lucide-react';
+import { ChevronRight, X, ChevronLeft, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../components/theme/ThemeContext';
 import './Welcome.css';
 import './Gallery.css';

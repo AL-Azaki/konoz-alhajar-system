@@ -188,8 +188,7 @@ export const Workers: React.FC = () => {
                       <button 
                         className={`btn-icon ${worker.isActive ? 'danger' : ''}`} 
                         title={worker.isActive ? 'تعطيل العامل' : 'تفعيل العامل'}
-                        onClick={() => toggleWorkerStatus(worker.id)}
-                      >
+                        onClick={() => handleToggleStatus(worker.id)}                      >
                         {worker.isActive ? <PowerOff size={18} /> : <Power size={18} style={{ color: 'var(--color-success)' }} />}
                       </button>
                       <button 
