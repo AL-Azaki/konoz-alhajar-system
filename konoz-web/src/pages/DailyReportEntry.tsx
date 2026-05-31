@@ -63,7 +63,7 @@ export const DailyReportEntry: React.FC = () => {
         setGroups(existingReport.groups);
       } else {
         // If report not found, go back
-        navigate('/daily-report');
+        navigate('/app/daily-report');
       }
     }
   }, [id, reports, navigate]);
@@ -166,7 +166,7 @@ export const DailyReportEntry: React.FC = () => {
         await addReport(newReport);
         toast.success('تم حفظ التقرير بنجاح');
       }
-      navigate('/daily-report');
+      navigate('/app/daily-report');
     } catch (error: any) {
       toast.error(getErrorMessage(error));
     }
@@ -180,7 +180,7 @@ export const DailyReportEntry: React.FC = () => {
           <p className="page-subtitle">أدخل تفاصيل إنتاج العمال والساعات الإضافية</p>
         </div>
         <div className="header-actions">
-          <button className="btn btn-outline" onClick={() => navigate('/daily-report')} style={{ marginLeft: '1rem' }}>
+          <button className="btn btn-outline" onClick={() => navigate('/app/daily-report')} style={{ marginLeft: '1rem' }}>
             إلغاء
           </button>
           <button className="btn btn-primary" onClick={handleSave}>

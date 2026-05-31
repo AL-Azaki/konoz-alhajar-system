@@ -104,7 +104,7 @@ export const ReportsList: React.FC = () => {
             <Printer size={18} />
             طباعة PDF
           </button>
-          <button className="btn btn-primary" onClick={() => navigate('/daily-report/new')}>
+          <button className="btn btn-primary" onClick={() => navigate('/app/daily-report/new')}>
             <Plus size={18} />
             إنشاء تقرير جديد
           </button>
@@ -252,7 +252,7 @@ export const ReportsList: React.FC = () => {
                         {(gIndex === 0 && pIndex === 0) ? (
                           <td data-label="إجراءات" className="no-print" rowSpan={report.groups.reduce((acc, g) => acc + g.productionItems.length, 0)}>
                             <div className="actions-cell">
-                              <button className="btn-icon" title="تعديل" onClick={() => navigate(`/daily-report/edit/${report.id}`)}>
+                              <button className="btn-icon" title="تعديل" onClick={() => navigate(`/app/daily-report/edit/${report.id}`)}>
                                 <Edit2 size={18} />
                               </button>
                               <button className="btn-icon danger" title="حذف" onClick={() => handleDelete(report.id)}>

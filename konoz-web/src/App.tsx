@@ -7,6 +7,7 @@ import { Users } from './pages/Users';
 import { Welcome } from './pages/Welcome';
 import { Gallery } from './pages/Gallery';
 import { Login } from './pages/Login';
+import { Settings } from './pages/Settings';
 import { WorkerProvider } from './context/WorkerContext';
 import { ReportProvider } from './context/ReportContext';
 import { AuthProvider } from './context/AuthContext';
@@ -36,13 +37,14 @@ function App() {
               <Route path="/login" element={<Login />} />
 
               {/* Protected Routes inside AppLayout */}
-              <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                <Route index element={<Navigate to="daily-report" replace />} />
                 <Route path="daily-report" element={<ReportsList />} />
                 <Route path="daily-report/new" element={<DailyReportEntry />} />
                 <Route path="daily-report/edit/:id" element={<DailyReportEntry />} />
                 <Route path="workers" element={<ProtectedRoute allowedRoles={['executive_manager', 'data_entry']}><Workers /></ProtectedRoute>} />
                 <Route path="users" element={<ProtectedRoute allowedRoles={['executive_manager']}><Users /></ProtectedRoute>} />
-                <Route path="settings" element={<div>الإعدادات (قريباً)</div>} />
+                <Route path="settings" element={<ProtectedRoute allowedRoles={['executive_manager', 'data_entry', 'factory_admin']}><Settings /></ProtectedRoute>} />
               </Route>
               
               {/* Fallback */}

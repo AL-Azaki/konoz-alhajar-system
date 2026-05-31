@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 export interface ProductionItem {
   id: string;
@@ -40,20 +41,31 @@ const ReportContext = createContext<ReportContextType | undefined>(undefined);
 export const ReportProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [reports, setReports] = useState<DailyReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   const refresh = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const { data } = await api.get('/daily-reports');
       setReports(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load reports:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    if (user) refresh();
+  }, [user, refresh]);
 
   const addReport = async (reportData: Omit<DailyReport, 'id' | 'createdAt'>) => {
     const { data } = await api.post('/daily-reports', reportData);

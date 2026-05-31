@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
     try {
       await login({ email, password });
       toast.success('تم تسجيل الدخول بنجاح');
-      navigate('/daily-report');
+      navigate('/app/daily-report');
     } catch (err: any) {
       const msg = getErrorMessage(err);
       setError(msg);

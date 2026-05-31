@@ -37,20 +37,26 @@ export const AppLayout: React.FC = () => {
         </div>
         
         <nav className="sidebar-nav">
-          <NavLink to="/daily-report" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/app/daily-report" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <FileSpreadsheet size={20} />
             <span>التقارير اليومية</span>
           </NavLink>
           {(hasRole('executive_manager') || hasRole('data_entry')) && (
-            <NavLink to="/workers" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <NavLink to="/app/workers" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
               <HardHat size={20} />
               <span>إدارة العمال</span>
             </NavLink>
           )}
           {hasRole('executive_manager') && (
-            <NavLink to="/users" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <NavLink to="/app/users" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
               <Users size={20} />
               <span>إدارة المستخدمين</span>
+            </NavLink>
+          )}
+          {hasRole(['executive_manager', 'data_entry', 'factory_admin']) && (
+            <NavLink to="/app/settings" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <Users size={20} />
+              <span>الإعدادات</span>
             </NavLink>
           )}
         </nav>

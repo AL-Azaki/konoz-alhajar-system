@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 export interface Worker {
   id: number;
@@ -37,20 +38,33 @@ const normalize = (w: Record<string, unknown>): Worker => ({
 export const WorkerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   const refresh = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const { data } = await api.get('/workers');
       setWorkers(data.map(normalize));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load workers:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    if (user) {
+      refresh();
+    }
+  }, [user, refresh]);
 
   const addWorker = async (payload: { name: string; phone: string; joined_at: string }) => {
     const { data } = await api.post('/workers', { ...payload, is_active: true });
