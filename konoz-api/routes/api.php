@@ -2,9 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test', function () {
+Route::get('/workers', function () {
     return response()->json([
-    'status' => true,
-    'message' => 'Konoz API working successfully'
+    [
+    'id' => 1,
+    'name' => 'Bashir'
+    ],
+    [
+    'id' => 2,
+    'name' => 'Ali'
+    ]
     ]);
 });
