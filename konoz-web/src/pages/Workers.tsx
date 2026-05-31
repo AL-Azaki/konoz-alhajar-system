@@ -7,7 +7,6 @@ import { getErrorMessage } from '../utils/errorHandler';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Card } from '../components/ui/Card';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import './Workers.css';
 

@@ -25,7 +25,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isDestructive = true,
 }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div style={{ textAlign: 'center', padding: '1rem 0' }}>
         <div style={{ 
           width: '64px', 

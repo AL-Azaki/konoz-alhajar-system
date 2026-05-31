@@ -8,7 +8,6 @@ import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../utils/errorHandler';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Card } from '../components/ui/Card';
 import './Workers.css'; /* Shared table styles */
 
 interface User {

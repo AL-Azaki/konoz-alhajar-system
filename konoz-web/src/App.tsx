@@ -20,9 +20,8 @@ function App() {
       <AuthProvider>
         <WorkerProvider>
           <ReportProvider>
-            <Toaster 
+            <Toaster
               position="top-center"
-              maxToasts={1}
               toastOptions={{
                 duration: 4000,
                 style: {
