@@ -124,6 +124,11 @@ class DailyReportController extends Controller
 
         DB::beginTransaction();
         try {
+            $user = auth()->user();
+            if (!$user->hasRole('executive_manager') && $dailyReport->user_id !== $user->id) {
+                return response()->json(['message' => 'عذراً، لا يمكنك تعديل تقرير قام بإنشائه مستخدم آخر.'], 403);
+            }
+
             $dailyReport->update([
                 'report_date' => $validated['date'],
                 'legacy_created_by'  => $validated['created_by'] ?? null,

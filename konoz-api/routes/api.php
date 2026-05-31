@@ -12,6 +12,7 @@ Route::post('/login', [AuthController::class , 'login']);
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class , 'user']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class , 'logout']);
 
     // Only Executive Manager can manage users
@@ -26,6 +27,12 @@ Route::middleware('auth:sanctum')->group(function () {
         }
         );
 
-        // Daily Reports CRUD (All roles can access, but we will protect specific actions in controller or via policies if needed)
-        Route::apiResource('daily-reports', DailyReportController::class);
+        // Daily Reports CRUD
+        Route::middleware('role:executive_manager')->group(function () {
+            Route::delete('daily-reports/{daily_report}', [DailyReportController::class, 'destroy']);
+        });
+
+        Route::middleware('role:executive_manager|data_entry|factory_admin')->group(function () {
+            Route::apiResource('daily-reports', DailyReportController::class)->except(['destroy']);
+        });
 });

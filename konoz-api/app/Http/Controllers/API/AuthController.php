@@ -59,8 +59,49 @@ class AuthController extends Controller
         return response()->json([
             'id' => $user->id,
             'name' => $user->name,
-            'email' => $user->email,    'is_active' => $user->is_active,
+            'email' => $user->email,
+            'is_active' => $user->is_active,
             'roles' => $user->roles->pluck('name')
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'current_password' => 'required_with:new_password',
+            'new_password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        if ($request->filled('new_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json(['message' => 'كلمة المرور الحالية غير صحيحة.'], 400);
+            }
+            $user->password = Hash::make($request->new_password);
+        }
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'تم تحديث الملف الشخصي بنجاح.',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => $user->is_active,
+                'roles' => $user->roles->pluck('name')
+            ]
         ]);
     }
 
