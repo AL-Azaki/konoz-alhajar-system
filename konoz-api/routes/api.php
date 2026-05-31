@@ -27,3 +27,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Daily Reports CRUD (All roles can access, but we will protect specific actions in controller or via policies if needed)
     Route::apiResource('daily-reports', DailyReportController::class);
 });
+
+
+Route::get('/test', function () {
+    return response()->json([
+    'status' => true,
+    'message' => 'Konoz API working successfully'
+    ]);
+});
