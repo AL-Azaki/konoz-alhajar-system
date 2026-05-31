@@ -5,6 +5,10 @@ import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../utils/errorHandler';
 import { Modal } from '../components/ui/Modal';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card } from '../components/ui/Card';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import './Workers.css';
 
 export const Workers: React.FC = () => {
@@ -12,6 +16,8 @@ export const Workers: React.FC = () => {
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [workerToDelete, setWorkerToDelete] = useState<number | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -63,15 +69,21 @@ export const Workers: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا العامل نهائياً؟')) {
+  const confirmDelete = async () => {
+    if (workerToDelete) {
       try {
-        await deleteWorker(id);
+        await deleteWorker(workerToDelete);
         toast.success('تم حذف العامل بنجاح');
       } catch (error: any) {
         toast.error(getErrorMessage(error));
       }
+      setWorkerToDelete(null);
     }
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setWorkerToDelete(id);
+    setDeleteModalOpen(true);
   };
 
   const handleToggleStatus = async (id: number) => {
@@ -91,10 +103,9 @@ export const Workers: React.FC = () => {
           <p className="workers-subtitle">إضافة، تعديل، وتعطيل العمال المنفذين للعمل</p>
         </div>
         {!isFormOpen && (
-          <button className="btn btn-primary" onClick={() => setIsFormOpen(true)}>
-            <Plus size={18} />
+          <Button onClick={() => setIsFormOpen(true)} rightIcon={<Plus size={18} />}>
             إضافة عامل جديد
-          </button>
+          </Button>
         )}
       </div>
 
@@ -103,51 +114,43 @@ export const Workers: React.FC = () => {
         onClose={resetForm} 
         title={editingId ? 'تعديل بيانات العامل' : 'تسجيل عامل جديد'}
       >
-        <form onSubmit={handleSubmit}>
-          <div className="form-grid" style={{ gridTemplateColumns: '1fr', marginBottom: '1rem' }}>
-            <div className="input-group">
-              <label className="input-label">اسم العامل</label>
-              <input 
-                type="text" 
-                className="input-field" 
-                value={formData.name}
-                onChange={e => setFormData({...formData, name: e.target.value})}
-                required
-                placeholder="مثال: أسامة أحمد"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="form-stack">
+          <div className="form-grid-2">
+            <Input 
+              label="اسم العامل"
+              type="text" 
+              value={formData.name}
+              onChange={e => setFormData({...formData, name: e.target.value})}
+              required
+              placeholder="مثال: أسامة أحمد"
+            />
             
-            <div className="input-group">
-              <label className="input-label">رقم الهاتف</label>
-              <input 
-                type="tel" 
-                className="input-field" 
-                value={formData.phone}
-                onChange={e => setFormData({...formData, phone: e.target.value})}
-                placeholder="مثال: 77XXXXXXX"
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">تاريخ الانضمام</label>
-              <input 
-                type="date" 
-                className="input-field" 
-                value={formData.joinDate}
-                onChange={e => setFormData({...formData, joinDate: e.target.value})}
-                required
-              />
-            </div>
+            <Input 
+              label="رقم الهاتف"
+              type="tel" 
+              value={formData.phone}
+              onChange={e => setFormData({...formData, phone: e.target.value})}
+              placeholder="مثال: 77XXXXXXX"
+              dir="ltr"
+            />
           </div>
 
-          <div className="form-actions" style={{ marginTop: '2rem' }}>
-            <button type="button" className="btn btn-outline" onClick={resetForm}>إلغاء</button>
-            <button type="submit" className="btn btn-primary">حفظ البيانات</button>
+          <Input 
+            label="تاريخ الانضمام"
+            type="date" 
+            value={formData.joinDate}
+            onChange={e => setFormData({...formData, joinDate: e.target.value})}
+            required
+          />
+
+          <div className="form-actions">
+            <Button type="button" variant="ghost" onClick={resetForm}>إلغاء</Button>
+            <Button type="submit">حفظ البيانات</Button>
           </div>
         </form>
       </Modal>
 
-      <div className="workers-table-container glass-panel">
+      <div className="workers-table-container">
         <table className="workers-table">
           <thead>
             <tr>
@@ -162,14 +165,14 @@ export const Workers: React.FC = () => {
           <tbody>
             {workers.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center' }}>لا يوجد عمال مسجلين حالياً</td>
+                <td colSpan={6} className="empty-state">لا يوجد عمال مسجلين حالياً</td>
               </tr>
             ) : (
               workers.map((worker, index) => (
                 <tr key={worker.id}>
                   <td>{index + 1}</td>
                   <td style={{ fontWeight: 600 }}>{worker.name}</td>
-                  <td dir="ltr" style={{ textAlign: 'right' }}>{worker.phone || '-'}</td>
+                  <td dir="ltr">{worker.phone || '-'}</td>
                   <td>{worker.joinDate}</td>
                   <td>
                     <span className={`status-badge ${worker.isActive ? 'active' : 'inactive'}`}>
@@ -179,24 +182,25 @@ export const Workers: React.FC = () => {
                   <td>
                     <div className="actions-cell">
                       <button 
-                        className="btn-icon" 
+                        className="action-btn edit"
                         title="تعديل"
                         onClick={() => handleEdit(worker)}
                       >
-                        <Edit2 size={18} />
+                        <Edit2 size={16} />
                       </button>
                       <button 
-                        className={`btn-icon ${worker.isActive ? 'danger' : ''}`} 
+                        className={`action-btn ${worker.isActive ? 'toggle-on' : 'toggle-off'}`}
                         title={worker.isActive ? 'تعطيل العامل' : 'تفعيل العامل'}
-                        onClick={() => handleToggleStatus(worker.id)}                      >
-                        {worker.isActive ? <PowerOff size={18} /> : <Power size={18} style={{ color: 'var(--color-success)' }} />}
+                        onClick={() => handleToggleStatus(worker.id)}
+                      >
+                        {worker.isActive ? <PowerOff size={16} /> : <Power size={16} />}
                       </button>
                       <button 
-                        className="btn-icon danger" 
-                        title="حذف نهائي"
-                        onClick={() => handleDelete(worker.id)}
+                        className="action-btn delete"
+                        title="حذف"
+                        onClick={() => handleDeleteClick(worker.id)}
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>
@@ -206,6 +210,17 @@ export const Workers: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="تأكيد الحذف"
+        message="هل أنت متأكد من حذف هذا العامل نهائياً؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="حذف العامل"
+        cancelText="إلغاء"
+        isDestructive={true}
+      />
     </div>
   );
 };

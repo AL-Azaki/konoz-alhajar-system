@@ -37,7 +37,7 @@
   flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 2rem;
-  padding-bottom: 12rem; /* Added large padding to ensure dropdowns open downwards */
+  padding-bottom: 4rem;
 }
 
 .worker-group-card {
@@ -100,7 +100,7 @@
   background-color: var(--color-primary);
   color: var(--color-text-light);
   border-color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
 }
 
 .inline-icon {
@@ -216,19 +216,23 @@
   }
 
   .production-grid-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     background-color: var(--color-surface-hover);
     padding: 1rem;
     border-radius: var(--radius-sm);
-    gap: 1rem;
+    gap: 0.75rem;
     border: 1px solid var(--color-border);
   }
 
   .mobile-field-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .mobile-field-group.action-group {
+    grid-column: span 2;
+    align-items: flex-end;
   }
 
   .mobile-only-label {

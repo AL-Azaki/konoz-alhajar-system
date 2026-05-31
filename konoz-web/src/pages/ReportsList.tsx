@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Printer, Edit2, Trash2, Filter } from 'lucide-react';
 import { useReports } from '../context/ReportContext';
 import { useWorkers } from '../context/WorkerContext';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import './ReportsList.css';
 
 export const ReportsList: React.FC = () => {
   const navigate = useNavigate();
   const { reports, deleteReport } = useReports();
   const { workers } = useWorkers();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState<string | null>(null);
 
   // Filters State
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -86,10 +89,17 @@ export const ReportsList: React.FC = () => {
     window.print();
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا التقرير؟')) {
-      deleteReport(id);
+  const confirmDelete = () => {
+    if (reportToDelete) {
+      deleteReport(reportToDelete);
+      setReportToDelete(null);
+      setDeleteModalOpen(false);
     }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setReportToDelete(id);
+    setDeleteModalOpen(true);
   };
 
   return (
@@ -115,7 +125,7 @@ export const ReportsList: React.FC = () => {
       <div className="filter-bar no-print glass-panel">
         <div className="filter-title">
           <Filter size={18} />
-          <span>تصفية التقارير</span>
+          <span>خيارات العرض والبحث</span>
         </div>
         <div className="filter-controls">
           <div className="filter-group">
@@ -147,7 +157,7 @@ export const ReportsList: React.FC = () => {
             </select>
           </div>
           <div className="filter-group">
-            <label>اسم العامل:</label>
+            <label>تحديد العامل:</label>
             <select 
               className="input-field select-field"
               value={selectedWorker}
@@ -255,7 +265,7 @@ export const ReportsList: React.FC = () => {
                               <button className="btn-icon" title="تعديل" onClick={() => navigate(`/app/daily-report/edit/${report.id}`)}>
                                 <Edit2 size={18} />
                               </button>
-                              <button className="btn-icon danger" title="حذف" onClick={() => handleDelete(report.id)}>
+                              <button className="btn-icon danger" title="حذف" onClick={() => handleDeleteClick(report.id)}>
                                 <Trash2 size={18} />
                               </button>
                             </div>
@@ -284,7 +294,18 @@ export const ReportsList: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+    </div>
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="تأكيد الحذف"
+        message="هل أنت متأكد من حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="حذف التقرير"
+        cancelText="إلغاء"
+        isDestructive={true}
+      />
     </div>
   );
 };

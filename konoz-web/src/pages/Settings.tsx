@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { User, Lock, Save } from 'lucide-react';
+import { User, Lock, Save, Phone, Mail, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../utils/errorHandler';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card } from '../components/ui/Card';
+import './Settings.css';
 
 export const Settings: React.FC = () => {
   const { user } = useAuth();
@@ -82,112 +86,155 @@ export const Settings: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-          <User className="text-primary" />
+    <div className="settings-page">
+      <div className="settings-header">
+        <h2 className="page-title">
+          <User size={22} />
           الإعدادات والملف الشخصي
         </h2>
-        <p className="text-muted text-sm mt-1">إدارة معلومات حسابك الشخصي وكلمة المرور</p>
+        <p className="page-subtitle">إدارة معلومات حسابك الشخصي وكلمة المرور</p>
       </div>
 
-      <div className="max-w-2xl bg-surface rounded-xl shadow-sm border border-border p-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 flex items-center gap-4">
-            <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold">
-              {user?.name ? user.name.charAt(0) : 'م'}
+      <div className="settings-grid">
+        {/* Profile & Account Form */}
+        <Card>
+          <form onSubmit={handleSubmit} className="form-stack">
+            
+            {/* User avatar card */}
+            <div className="profile-card">
+              <div className="profile-avatar">
+                {user?.name ? user.name.charAt(0) : 'م'}
+              </div>
+              <div className="profile-info">
+                <h3>{user?.name}</h3>
+                <p>{roleName}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-lg">{user?.name}</h3>
-              <p className="text-muted text-sm">{roleName}</p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="form-group">
-              <label className="block text-sm font-medium mb-1">الاسم</label>
-              <input 
+            <div className="settings-section-title">
+              <User size={16} />
+              المعلومات الشخصية
+            </div>
+
+            <div className="form-grid-2">
+              <Input 
+                label="الاسم"
                 type="text" 
                 name="name"
-                className="w-full p-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
                 value={formData.name}
                 onChange={handleChange}
                 required
               />
-            </div>
-            
-            <div className="form-group">
-              <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
-              <input 
+              
+              <Input 
+                label="البريد الإلكتروني"
                 type="email" 
                 name="email"
                 dir="ltr"
-                className="w-full p-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
                 value={formData.email}
                 onChange={handleChange}
                 required
               />
             </div>
-          </div>
 
-          <hr className="border-border my-2" />
+            <div className="settings-divider"></div>
 
-          <div>
-            <h4 className="font-medium flex items-center gap-2 mb-4">
-              <Lock size={18} className="text-muted" />
+            <div className="settings-section-title">
+              <Lock size={16} />
               تغيير كلمة المرور (اختياري)
-            </h4>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-group md:col-span-2">
-                <label className="block text-sm font-medium mb-1">كلمة المرور الحالية</label>
-                <input 
-                  type="password" 
-                  name="current_password"
-                  dir="ltr"
-                  className="w-full md:w-1/2 p-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                  value={formData.current_password}
-                  onChange={handleChange}
-                  placeholder="أدخل كلمة المرور الحالية إذا أردت التغيير"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="block text-sm font-medium mb-1">كلمة المرور الجديدة</label>
-                <input 
-                  type="password" 
-                  name="new_password"
-                  dir="ltr"
-                  className="w-full p-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                  value={formData.new_password}
-                  onChange={handleChange}
-                  minLength={6}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="block text-sm font-medium mb-1">تأكيد كلمة المرور الجديدة</label>
-                <input 
-                  type="password" 
-                  name="new_password_confirmation"
-                  dir="ltr"
-                  className="w-full p-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                  value={formData.new_password_confirmation}
-                  onChange={handleChange}
-                  minLength={6}
-                />
-              </div>
             </div>
-          </div>
+            
+            <Input 
+              label="كلمة المرور الحالية"
+              type="password" 
+              name="current_password"
+              dir="ltr"
+              value={formData.current_password}
+              onChange={handleChange}
+              placeholder="أدخل كلمة المرور الحالية إذا أردت التغيير"
+            />
 
-          <div className="flex justify-end mt-4">
-            <button type="submit" className="btn btn-primary flex items-center gap-2" disabled={isLoading}>
-              <Save size={18} />
-              {isLoading ? 'جاري الحفظ...' : 'حفظ التعديلات'}
-            </button>
-          </div>
-        </form>
+            <div className="form-grid-2">
+              <Input 
+                label="كلمة المرور الجديدة"
+                type="password" 
+                name="new_password"
+                dir="ltr"
+                value={formData.new_password}
+                onChange={handleChange}
+                minLength={6}
+              />
+
+              <Input 
+                label="تأكيد كلمة المرور الجديدة"
+                type="password" 
+                name="new_password_confirmation"
+                dir="ltr"
+                value={formData.new_password_confirmation}
+                onChange={handleChange}
+                minLength={6}
+              />
+            </div>
+
+            <div className="form-actions">
+              <Button type="submit" isLoading={isLoading} rightIcon={<Save size={18} />}>
+                حفظ التعديلات
+              </Button>
+            </div>
+          </form>
+        </Card>
+
+        {/* Support Card */}
+        <div className="support-section">
+          <Card>
+            <div className="support-header">
+              <h3>الدعم الفني</h3>
+              <p>تواصل معنا للمساعدة</p>
+            </div>
+            
+            <div className="support-items">
+              <a href="tel:0552154400" className="support-item">
+                <div className="support-icon phone-icon">
+                  <Phone size={18} />
+                </div>
+                <div>
+                  <span className="support-label">الجوال</span>
+                  <span className="support-value" dir="ltr">055 215 4400</span>
+                </div>
+              </a>
+
+              <a href="tel:0122330403" className="support-item">
+                <div className="support-icon phone-icon">
+                  <Phone size={18} />
+                </div>
+                <div>
+                  <span className="support-label">الهاتف</span>
+                  <span className="support-value" dir="ltr">012 233 0403</span>
+                </div>
+              </a>
+
+              <a href="https://wa.me/966552154400" target="_blank" rel="noreferrer" className="support-item">
+                <div className="support-icon whatsapp-icon">
+                  <MessageCircle size={18} />
+                </div>
+                <div>
+                  <span className="support-label">واتساب</span>
+                  <span className="support-value" dir="ltr">055 215 4400</span>
+                </div>
+              </a>
+
+              <a href="mailto:stonetreasures.est@gmail.com" className="support-item">
+                <div className="support-icon mail-icon">
+                  <Mail size={18} />
+                </div>
+                <div>
+                  <span className="support-label">البريد الإلكتروني</span>
+                  <span className="support-value" dir="ltr">stonetreasures.est@gmail.com</span>
+                </div>
+              </a>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

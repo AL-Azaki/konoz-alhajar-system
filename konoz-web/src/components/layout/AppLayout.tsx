@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { FileSpreadsheet, Factory, Moon, Sun, Menu, X, HardHat, LogOut, Users } from 'lucide-react';
+import { FileSpreadsheet, Moon, Sun, Menu, X, HardHat, LogOut, Users, Settings } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import './AppLayout.css';
@@ -22,17 +22,17 @@ export const AppLayout: React.FC = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`sidebar glass-panel ${isMobileMenuOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="logo-container">
-            <Factory className="logo-icon" size={28} />
-            <div>
+            <img src="/images/logo.png" alt="كنوز الحجر" className="logo-img" />
+            <div className="logo-text-group">
               <h1 className="logo-text">كنوز الحجر</h1>
-              <p className="subtitle">إدارة الإنتاج</p>
+              <p className="subtitle">STONE TREASURES</p>
             </div>
           </div>
           <button className="mobile-close-btn" onClick={closeMobileMenu}>
-            <X size={24} />
+            <X size={22} />
           </button>
         </div>
         
@@ -55,7 +55,7 @@ export const AppLayout: React.FC = () => {
           )}
           {hasRole(['executive_manager', 'data_entry', 'factory_admin']) && (
             <NavLink to="/app/settings" onClick={closeMobileMenu} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-              <Users size={20} />
+              <Settings size={20} />
               <span>الإعدادات</span>
             </NavLink>
           )}
@@ -77,7 +77,7 @@ export const AppLayout: React.FC = () => {
 
       {/* Main Content */}
       <main className="main-content">
-        <header className="top-bar glass-panel">
+        <header className="top-bar">
           <div className="top-bar-right">
             <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
               <Menu size={24} />
@@ -93,7 +93,7 @@ export const AppLayout: React.FC = () => {
               <div className="avatar">{user?.name ? user.name.charAt(0) : 'م'}</div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span className="user-name">{user?.name || 'مستخدم'}</span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+                <span className="user-role">
                   {hasRole('executive_manager') ? 'المدير التنفيذي' : 
                    hasRole('factory_admin') ? 'مدير المصنع' : 
                    hasRole('data_entry') ? 'مدخل بيانات' : ''}

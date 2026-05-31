@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Shield, UserX, UserCheck } from 'lucide-react';
 import api from '../services/api';
 import { Modal } from '../components/ui/Modal';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../utils/errorHandler';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card } from '../components/ui/Card';
+import './Workers.css'; /* Shared table styles */
 
 interface User {
   id: number;
@@ -17,6 +22,8 @@ interface User {
 export const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState<Partial<User> | null>(null);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -61,15 +68,23 @@ export const Users: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
-    try {
-      await api.delete(`/users/${id}`);
-      fetchUsers();
-      toast.success('تم حذف المستخدم بنجاح');
-    } catch (err: any) {
-      toast.error(getErrorMessage(err));
+  const confirmDelete = async () => {
+    if (userToDelete) {
+      try {
+        await api.delete(`/users/${userToDelete}`);
+        fetchUsers();
+        toast.success('تم حذف المستخدم بنجاح');
+      } catch (err: any) {
+        toast.error(getErrorMessage(err));
+      }
+      setUserToDelete(null);
+      setDeleteModalOpen(false);
     }
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setUserToDelete(id);
+    setDeleteModalOpen(true);
   };
 
   const toggleStatus = async (user: User) => {
@@ -90,90 +105,98 @@ export const Users: React.FC = () => {
     'data_entry': 'مدخل بيانات',
   };
 
+  const getRoleBadgeClass = (role: string) => {
+    switch (role) {
+      case 'executive_manager': return 'role-badge executive';
+      case 'factory_admin': return 'role-badge factory';
+      default: return 'role-badge data-entry';
+    }
+  };
+
   return (
-    <div className="users-page">
-      <div className="page-header flex justify-between items-center mb-6">
+    <div className="workers-page">
+      <div className="page-header">
         <div>
-          <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <Shield className="text-primary" />
+          <h2 className="page-title">
+            <Shield size={22} />
             إدارة المستخدمين والصلاحيات
           </h2>
-          <p className="text-muted text-sm mt-1">إضافة وتعديل حسابات الموظفين وتحديد صلاحياتهم</p>
+          <p className="page-subtitle">إضافة وتعديل حسابات الموظفين وتحديد صلاحياتهم</p>
         </div>
-        <button 
-          className="btn btn-primary flex items-center gap-2"
+        <Button 
           onClick={() => {
             setCurrentUser({ role: 'data_entry', is_active: true });
             setPassword('');
             setIsModalOpen(true);
           }}
+          rightIcon={<Plus size={18} />}
         >
-          <Plus size={20} />
-          <span>مستخدم جديد</span>
-        </button>
+          مستخدم جديد
+        </Button>
       </div>
 
       {isLoading ? (
-        <div className="text-center p-8">جاري التحميل...</div>
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+        </div>
       ) : error ? (
-        <div className="text-center text-danger p-8">{error}</div>
+        <div className="error-state">{error}</div>
       ) : (
-        <div className="table-responsive bg-surface rounded-xl shadow-sm border border-border">
-          <table className="w-full text-right border-collapse">
+        <div className="workers-table-container">
+          <table className="users-table">
             <thead>
-              <tr className="bg-gray-50 border-b border-border">
-                <th className="p-4 font-semibold text-gray-600">الاسم</th>
-                <th className="p-4 font-semibold text-gray-600">البريد الإلكتروني</th>
-                <th className="p-4 font-semibold text-gray-600">الصلاحية (الدور)</th>
-                <th className="p-4 font-semibold text-gray-600">الحالة</th>
-                <th className="p-4 font-semibold text-gray-600">الإجراءات</th>
+              <tr>
+                <th>م</th>
+                <th>الاسم</th>
+                <th>البريد الإلكتروني</th>
+                <th>الصلاحية (الدور)</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
               </tr>
             </thead>
             <tbody>
-              {users.map(u => (
-                <tr key={u.id} className="border-b border-border hover:bg-gray-50 transition-colors">
-                  <td className="p-4 font-medium">{u.name}</td>
-                  <td className="p-4" dir="ltr">{u.email}</td>
-                  <td className="p-4">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                      u.role === 'executive_manager' ? 'bg-purple-100 text-purple-800' :
-                      u.role === 'factory_admin' ? 'bg-blue-100 text-blue-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+              {users.map((u, index) => (
+                <tr key={u.id}>
+                  <td>{index + 1}</td>
+                  <td style={{ fontWeight: 600 }}>{u.name}</td>
+                  <td dir="ltr">{u.email}</td>
+                  <td>
+                    <span className={getRoleBadgeClass(u.role)}>
                       {roleNameMap[u.role] || u.role}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td>
                     <button 
                       onClick={() => toggleStatus(u)}
                       disabled={u.id === loggedInUser?.id}
-                      className={`flex items-center gap-1 text-sm ${u.is_active ? 'text-success' : 'text-danger'} ${u.id === loggedInUser?.id ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}`}
+                      className={`status-toggle-btn ${u.is_active ? 'active' : 'inactive'}`}
                     >
                       {u.is_active ? <UserCheck size={16} /> : <UserX size={16} />}
                       {u.is_active ? 'نشط' : 'معطل'}
                     </button>
                   </td>
-                  <td className="p-4 flex gap-2">
-                    <button 
-                      className="text-primary hover:text-blue-700 transition"
-                      title="تعديل"
-                      onClick={() => {
-                        setCurrentUser(u);
-                        setPassword('');
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button 
-                      className="text-danger hover:text-red-700 transition"
-                      title="حذف"
-                      disabled={u.id === loggedInUser?.id}
-                      style={{ opacity: u.id === loggedInUser?.id ? 0.3 : 1 }}
-                      onClick={() => handleDelete(u.id)}
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                  <td>
+                    <div className="actions-cell">
+                      <button 
+                        className="action-btn edit"
+                        title="تعديل"
+                        onClick={() => {
+                          setCurrentUser(u);
+                          setPassword('');
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        className="action-btn delete"
+                        title="حذف"
+                        disabled={u.id === loggedInUser?.id}
+                        onClick={() => handleDeleteClick(u.id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -187,85 +210,87 @@ export const Users: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         title={currentUser?.id ? 'تعديل بيانات المستخدم' : 'إضافة مستخدم جديد'}
       >
-        <form onSubmit={handleSave} className="flex flex-col gap-4 p-4">
-          <div className="form-group">
-            <label className="block text-sm font-medium mb-1">اسم المستخدم</label>
-            <input 
+        <form onSubmit={handleSave} className="form-stack">
+          <div className="form-grid-2">
+            <Input 
+              label="اسم المستخدم"
               type="text" 
-              className="w-full p-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
               value={currentUser?.name || ''}
               onChange={e => setCurrentUser({ ...currentUser, name: e.target.value })}
               required
             />
-          </div>
-          
-          <div className="form-group">
-            <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
-            <input 
+            
+            <Input 
+              label="البريد الإلكتروني"
               type="email" 
               dir="ltr"
-              className="w-full p-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
               value={currentUser?.email || ''}
               onChange={e => setCurrentUser({ ...currentUser, email: e.target.value })}
               required
             />
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium mb-1">
-              كلمة المرور 
-              {currentUser?.id && <span className="text-xs text-muted font-normal mr-2">(اتركها فارغة إذا لم ترد تغييرها)</span>}
-            </label>
-            <input 
+          <div className="form-grid-2">
+            <Input 
+              label={`كلمة المرور ${currentUser?.id ? '(اختياري)' : ''}`}
               type="password" 
               dir="ltr"
-              className="w-full p-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required={!currentUser?.id}
               minLength={6}
             />
+
+            <div className="select-wrapper">
+              <label className="select-label">الصلاحية (الدور)</label>
+              <select 
+                className="select-field"
+                value={currentUser?.role || ''}
+                onChange={e => setCurrentUser({ ...currentUser, role: e.target.value })}
+                required
+              >
+                <option value="">-- اختر الصلاحية --</option>
+                <option value="executive_manager">المدير التنفيذي</option>
+                <option value="factory_admin">مدير المصنع</option>
+                <option value="data_entry">مدخل بيانات</option>
+              </select>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium mb-1">الصلاحية (الدور)</label>
-            <select 
-              className="w-full p-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-              value={currentUser?.role || ''}
-              onChange={e => setCurrentUser({ ...currentUser, role: e.target.value })}
-              required
-            >
-              <option value="">-- اختر الصلاحية --</option>
-              <option value="executive_manager">المدير التنفيذي</option>
-              <option value="factory_admin">مدير المصنع</option>
-              <option value="data_entry">مدخل بيانات</option>
-            </select>
-          </div>
-
-          <div className="form-group flex items-center gap-2 mt-2">
+          <div className="checkbox-row">
             <input 
               type="checkbox" 
               id="isActiveCheck"
-              className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded"
               checked={currentUser?.is_active ?? true}
               onChange={e => setCurrentUser({ ...currentUser, is_active: e.target.checked })}
               disabled={currentUser?.id === loggedInUser?.id}
             />
-            <label htmlFor="isActiveCheck" className="text-sm font-medium cursor-pointer">
+            <label htmlFor="isActiveCheck">
               حساب نشط (يمكنه تسجيل الدخول)
             </label>
           </div>
 
-          <div className="flex gap-3 justify-end mt-4">
-            <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>
+          <div className="form-actions">
+            <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
               إلغاء
-            </button>
-            <button type="submit" className="btn btn-primary">
+            </Button>
+            <Button type="submit">
               حفظ البيانات
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="تأكيد الحذف"
+        message="هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="حذف المستخدم"
+        cancelText="إلغاء"
+        isDestructive={true}
+      />
     </div>
   );
 };
