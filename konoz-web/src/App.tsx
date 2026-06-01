@@ -13,7 +13,7 @@ import { InventoryDashboard } from './pages/InventoryDashboard';
 import { InventoryDispatch } from './pages/InventoryDispatch';
 import { InventoryLedger } from './pages/InventoryLedger';
 import { PlaceholderPage } from './pages/PlaceholderPage';
-import { Wrench, Factory, Package, Clock, Wallet } from 'lucide-react';
+import { Wrench, Factory, Clock, Wallet } from 'lucide-react';
 import { WorkerProvider } from './context/WorkerContext';
 import { ReportProvider } from './context/ReportContext';
 import { InventoryProvider } from './context/InventoryContext';

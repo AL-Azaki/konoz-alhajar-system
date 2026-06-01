@@ -40,9 +40,6 @@ export const InventoryDispatch: React.FC = () => {
   const PRODUCTION_TYPES = factorySettings.productionTypes;
   const SIZES = factorySettings.sizes;
 
-  // Only show stock items that have a positive balance
-  const availableStock = balances.filter(b => b.currentBalance > 0);
-
   const handleAddItem = () => {
     setItems([...items, { 
       id: Date.now().toString(), 

@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Printer, Edit2, Trash2, Filter } from 'lucide-react';
+import { Plus, Printer, Edit2, Trash2 } from 'lucide-react';
 import { useReports } from '../context/ReportContext';
 import { useWorkers } from '../context/WorkerContext';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
-import { Activity, Clock, Layers, Users } from 'lucide-react';
+import { Clock, Layers, Users } from 'lucide-react';
 import './ReportsList.css';
 
 import { format } from 'date-fns';
