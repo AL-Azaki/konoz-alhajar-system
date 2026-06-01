@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Plus, Trash2, Users, FileText, Check, Clock } from 'lucide-react';
+import { Plus, Trash2, Users, FileText, Check, Clock, Copy } from 'lucide-react';
 import { useWorkers } from '../context/WorkerContext';
 import { useReports } from '../context/ReportContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../utils/errorHandler';
+import { Button } from '../components/ui/Button';
 import './DailyReportEntry.css';
 
 const WORK_TYPES = [
@@ -53,6 +54,7 @@ export const DailyReportEntry: React.FC = () => {
     extraDuties: '',
     extraHours: 0
   }]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If in edit mode, populate form with existing report
   React.useEffect(() => {
@@ -87,6 +89,26 @@ export const DailyReportEntry: React.FC = () => {
 
   const removeGroup = (id: string) => {
     setGroups(groups.filter(g => g.id !== id));
+  };
+
+  const duplicateGroup = (id: string) => {
+    const groupToDuplicate = groups.find(g => g.id === id);
+    if (groupToDuplicate) {
+      const newGroup: WorkerGroup = {
+        ...groupToDuplicate,
+        id: Date.now().toString(),
+        productionItems: groupToDuplicate.productionItems.map((item, idx) => ({
+          ...item,
+          id: Date.now().toString() + '_' + idx + '_copy'
+        }))
+      };
+      // Insert after the duplicated group
+      const index = groups.findIndex(g => g.id === id);
+      const newGroups = [...groups];
+      newGroups.splice(index + 1, 0, newGroup);
+      setGroups(newGroups);
+      toast.success('تم تكرار المجموعة بنجاح');
+    }
   };
 
   const updateGroup = (id: string, updates: Partial<WorkerGroup>) => {
@@ -153,23 +175,28 @@ export const DailyReportEntry: React.FC = () => {
       return;
     }
 
+    setIsSubmitting(true);
+
     const newReport = {
       date: reportDate,
       groups: groups
     };
 
-    try {
-      if (id) {
-        await updateReport(id, newReport);
-        toast.success('تم تعديل التقرير بنجاح');
-      } else {
-        await addReport(newReport);
-        toast.success('تم حفظ التقرير بنجاح');
+    setTimeout(async () => {
+      try {
+        if (id) {
+          await updateReport(id, newReport);
+          toast.success('تم تعديل التقرير بنجاح');
+        } else {
+          await addReport(newReport);
+          toast.success('تم حفظ التقرير بنجاح');
+        }
+        navigate('/app/daily-report');
+      } catch (error: any) {
+        toast.error(getErrorMessage(error));
+        setIsSubmitting(false);
       }
-      navigate('/app/daily-report');
-    } catch (error: any) {
-      toast.error(getErrorMessage(error));
-    }
+    }, 600);
   };
 
   return (
@@ -180,13 +207,12 @@ export const DailyReportEntry: React.FC = () => {
           <p className="page-subtitle">أدخل تفاصيل إنتاج العمال والساعات الإضافية</p>
         </div>
         <div className="header-actions">
-          <button className="btn btn-outline" onClick={() => navigate('/app/daily-report')} style={{ marginLeft: '1rem' }}>
+          <Button variant="outline" onClick={() => navigate('/app/daily-report')} disabled={isSubmitting} style={{ marginLeft: '1rem' }}>
             إلغاء
-          </button>
-          <button className="btn btn-primary" onClick={handleSave}>
-            <Check size={18} />
+          </Button>
+          <Button onClick={handleSave} isLoading={isSubmitting} rightIcon={<Check size={18} />}>
             {id ? 'حفظ التعديلات' : 'حفظ التقرير'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -208,9 +234,14 @@ export const DailyReportEntry: React.FC = () => {
             <div key={group.id} className="worker-group-card">
               <div className="group-header">
                 <h3>مجموعة العمل #{index + 1}</h3>
-                <button className="btn-icon danger" title="حذف المجموعة" onClick={() => removeGroup(group.id)}>
-                  <Trash2 size={18} />
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button className="btn-icon" style={{ color: 'var(--color-primary)' }} title="تكرار المجموعة" onClick={() => duplicateGroup(group.id)}>
+                    <Copy size={18} />
+                  </button>
+                  <button className="btn-icon danger" title="حذف المجموعة" onClick={() => removeGroup(group.id)}>
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
 
               <div className="group-body">

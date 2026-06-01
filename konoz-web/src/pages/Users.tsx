@@ -142,7 +142,8 @@ export const Users: React.FC = () => {
         <div className="error-state">{error}</div>
       ) : (
         <div className="workers-table-container">
-          <table className="users-table">
+          <div className="table-responsive">
+            <table className="users-table">
             <thead>
               <tr>
                 <th>م</th>
@@ -200,7 +201,8 @@ export const Users: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       )}
 

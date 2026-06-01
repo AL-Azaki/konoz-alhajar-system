@@ -114,33 +114,31 @@ export const Workers: React.FC = () => {
         title={editingId ? 'تعديل بيانات العامل' : 'تسجيل عامل جديد'}
       >
         <form onSubmit={handleSubmit} className="form-stack">
+          <Input 
+            label="اسم العامل"
+            type="text" 
+            value={formData.name}
+            onChange={e => setFormData({...formData, name: e.target.value})}
+            required
+            placeholder="مثال: أسامة أحمد"
+          />
           <div className="form-grid-2">
-            <Input 
-              label="اسم العامل"
-              type="text" 
-              value={formData.name}
-              onChange={e => setFormData({...formData, name: e.target.value})}
-              required
-              placeholder="مثال: أسامة أحمد"
-            />
-            
             <Input 
               label="رقم الهاتف"
               type="tel" 
               value={formData.phone}
               onChange={e => setFormData({...formData, phone: e.target.value})}
-              placeholder="مثال: 77XXXXXXX"
+              placeholder="77XXXXXXX"
               dir="ltr"
             />
+            <Input 
+              label="تاريخ الانضمام"
+              type="date" 
+              value={formData.joinDate}
+              onChange={e => setFormData({...formData, joinDate: e.target.value})}
+              required
+            />
           </div>
-
-          <Input 
-            label="تاريخ الانضمام"
-            type="date" 
-            value={formData.joinDate}
-            onChange={e => setFormData({...formData, joinDate: e.target.value})}
-            required
-          />
 
           <div className="form-actions">
             <Button type="button" variant="ghost" onClick={resetForm}>إلغاء</Button>
@@ -150,7 +148,8 @@ export const Workers: React.FC = () => {
       </Modal>
 
       <div className="workers-table-container">
-        <table className="workers-table">
+        <div className="table-responsive">
+          <table className="workers-table">
           <thead>
             <tr>
               <th>م</th>
@@ -207,7 +206,8 @@ export const Workers: React.FC = () => {
               ))
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       <ConfirmModal

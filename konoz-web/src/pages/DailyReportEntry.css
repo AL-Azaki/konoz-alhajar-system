@@ -45,7 +45,13 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  transition: all var(--transition-fast);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  animation: slideDownFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownFade {
+  from { opacity: 0; transform: translateY(-15px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .worker-group-card:hover {
@@ -87,20 +93,28 @@
   border-radius: 2rem;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+  font-weight: 500;
 }
 
 .worker-chip:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15);
+}
+
+.worker-chip:active {
+  transform: translateY(0);
 }
 
 .worker-chip.selected {
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
   color: var(--color-text-light);
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
+  font-weight: 700;
 }
 
 .inline-icon {
@@ -165,6 +179,7 @@
   gap: 0.75rem;
   align-items: center;
   margin-bottom: 0.75rem;
+  animation: slideDownFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .w-full {
@@ -195,14 +210,21 @@
 
 .add-group-btn {
   width: 100%;
-  padding: 1rem;
-  border-style: dashed;
+  padding: 1.25rem;
+  border: 2px dashed var(--color-border);
   color: var(--color-primary);
+  background: var(--color-surface);
+  font-weight: 700;
+  font-size: 1.05rem;
+  border-radius: var(--radius-xl);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .add-group-btn:hover {
-  background-color: rgba(37, 99, 235, 0.05);
   border-color: var(--color-primary);
+  background: linear-gradient(145deg, rgba(255,255,255,1) 0%, rgba(212, 175, 55, 0.05) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.2);
 }
 
 .mt-2 {

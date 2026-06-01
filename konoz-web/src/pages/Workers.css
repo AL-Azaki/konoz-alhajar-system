@@ -1,11 +1,14 @@
 /* ═══════════════════════════════════
    Workers Page — Clean Table Design
+   Enhanced with full scroll support
    ═══════════════════════════════════ */
 
 .workers-page {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
+  width: 100%;
 }
 
 /* ── Page Header ── */
@@ -30,15 +33,44 @@
   margin: 0;
 }
 
-/* ── Table Container ── */
+/* ── Table Container — Horizontal + Vertical Scroll ── */
 .workers-table-container {
   border-radius: var(--radius-lg);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+  flex: 1;
+}
+
+/* Custom scrollbar for the table container */
+.workers-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.workers-table-container::-webkit-scrollbar-track {
+  background: var(--color-bg);
+  border-radius: 4px;
+}
+.workers-table-container::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+.workers-table-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+.workers-table-container::-webkit-scrollbar-corner {
+  background: var(--color-bg);
 }
 
 /* ── Data Table ── */
@@ -47,7 +79,7 @@
   width: 100%;
   border-collapse: collapse;
   text-align: right;
-  min-width: 650px;
+  min-width: 700px; /* Force horizontal scroll if container is smaller */
 }
 
 .workers-table th,
@@ -59,6 +91,10 @@
   font-size: 0.85rem;
   white-space: nowrap;
   text-align: right;
+  /* Sticky header while scrolling vertically */
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .workers-table th:first-child,
@@ -71,6 +107,12 @@
   border-radius: var(--radius-md) 0 0 0;
 }
 
+/* Remove border-radius on sticky when scrolling */
+.workers-table-container:not(:first-child) .workers-table th:first-child,
+.workers-table-container:not(:first-child) .users-table th:first-child {
+  border-radius: 0;
+}
+
 .workers-table td,
 .users-table td {
   padding: 0.75rem 1rem;
@@ -78,6 +120,7 @@
   color: var(--color-text-main);
   font-size: 0.9rem;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .workers-table tbody tr:last-child td,
@@ -206,6 +249,7 @@
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .status-toggle-btn.active {
@@ -382,24 +426,35 @@
   .workers-header,
   .page-header {
     flex-direction: column;
-    align-items: flex-start; /* Changed from stretch so buttons don't get huge */
+    align-items: flex-start;
     gap: 1rem;
   }
 
   .workers-table-container {
-    margin: 0 -1rem; /* Allow table to scroll edge-to-edge on mobile */
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    padding-bottom: 0.5rem; /* Space for scrollbar */
+    margin: 0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    width: 100%;
+    overflow-x: hidden;
   }
 
-  /* Make sure the scrollbar is visible for horizontal scrolling */
-  .workers-table-container::-webkit-scrollbar {
-    height: 6px;
+  .workers-table,
+  .users-table {
+    min-width: 800px;
   }
-  .workers-table-container::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 3px;
+
+  /* Form grid stays 2 columns for smaller inputs on mobile */
+  .form-grid-2 {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .form-actions .btn {
+    width: 100%;
   }
 }

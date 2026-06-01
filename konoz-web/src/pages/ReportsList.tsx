@@ -4,7 +4,10 @@ import { Plus, Printer, Edit2, Trash2, Filter } from 'lucide-react';
 import { useReports } from '../context/ReportContext';
 import { useWorkers } from '../context/WorkerContext';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { Activity, Clock, Layers, Users } from 'lucide-react';
 import './ReportsList.css';
+
+import { format } from 'date-fns';
 
 export const ReportsList: React.FC = () => {
   const navigate = useNavigate();
@@ -13,71 +16,55 @@ export const ReportsList: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<string | null>(null);
 
-  // Filters State
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
-  const [selectedWorker, setSelectedWorker] = useState<string>('all');
+  // Calculate Summary Statistics for TODAY only
+  const summaryStats = useMemo(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const todaysReports = reports.filter(r => r.date === today);
 
-  // Extract unique months from reports for the filter dropdown (e.g., '2026-05')
-  const availableMonths = useMemo(() => {
-    const months = new Set<string>();
-    reports.forEach(r => {
-      if (r.date) {
-        const monthStr = r.date.substring(0, 7); // yyyy-mm
-        months.add(monthStr);
-      }
+    let totalWorkers = new Set<number>();
+    let totalExtraHours = 0;
+    
+    // Group production: workType -> productionType -> size -> unit -> qty
+    const productionMap = new Map<string, { workType: string, productionType: string, size: string, unit: string, qty: number }>();
+
+    todaysReports.forEach(report => {
+      report.groups.forEach(g => {
+        g.workerIds.forEach(id => totalWorkers.add(id));
+        totalExtraHours += g.extraHours;
+        
+        g.productionItems.forEach(item => {
+          // Exclude things that are not actual stone production if they want, but let's include all to be safe
+          const key = `${item.workType}|${item.productionType}|${item.size}|${item.unit}`;
+          if (productionMap.has(key)) {
+            productionMap.get(key)!.qty += item.quantity;
+          } else {
+            productionMap.set(key, { 
+              workType: item.workType, 
+              productionType: item.productionType, 
+              size: item.size, 
+              unit: item.unit, 
+              qty: item.quantity 
+            });
+          }
+        });
+      });
     });
-    // Sort descending
-    return Array.from(months).sort((a, b) => b.localeCompare(a));
+
+    return {
+      workersCount: totalWorkers.size,
+      extraHours: totalExtraHours,
+      productionDetails: Array.from(productionMap.values())
+    };
   }, [reports]);
 
-  // Format month string to Arabic display
-  const formatMonth = (monthStr: string) => {
-    const date = new Date(`${monthStr}-01`);
-    return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' });
-  };
-
-  // Apply filters
-  const filteredReports = useMemo(() => {
-    return reports.filter(report => {
-      // Exact Date Filter
-      if (selectedDate && report.date !== selectedDate) {
-        return false;
-      }
-
-      // Month Filter (only applied if exact date is not selected)
-      if (!selectedDate && selectedMonth !== 'all' && !report.date.startsWith(selectedMonth)) {
-        return false;
-      }
-      
-      // Worker Filter
-      if (selectedWorker !== 'all') {
-        const workerId = parseInt(selectedWorker);
-        const hasWorker = report.groups.some(g => g.workerIds.includes(workerId));
-        if (!hasWorker) return false;
-      }
-
-      return true;
-    });
-  }, [reports, selectedDate, selectedMonth, selectedWorker]);
-
   const printDateText = useMemo(() => {
-    if (filteredReports.length === 0) return 'جميع التواريخ';
+    if (reports.length === 0) return 'جميع التواريخ';
     
-    // Check if all filtered reports have the exact same date
-    const firstDate = filteredReports[0].date;
-    const allSameDate = filteredReports.every(r => r.date === firstDate);
-    
-    if (allSameDate) {
-      // Return full formatted date: e.g. Sunday, 24 May 2026
-      return new Date(firstDate).toLocaleDateString('ar-EG-u-nu-latn', { 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-      });
-    } else if (selectedMonth !== 'all') {
-      return formatMonth(selectedMonth);
-    }
-    return 'جميع التواريخ';
-  }, [filteredReports, selectedMonth]);
+    // Return full formatted date for today
+    return new Date().toLocaleDateString('ar-EG-u-nu-latn', { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    });
+  }, [reports]);
 
   const getWorkerNames = (workerIds: number[]) => {
     return workerIds
@@ -121,53 +108,50 @@ export const ReportsList: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="filter-bar no-print glass-panel">
-        <div className="filter-title">
-          <Filter size={18} />
-          <span>خيارات العرض والبحث</span>
+      {/* Summary Cards */}
+      <div className="summary-cards-container no-print">
+        <div className="summary-card compact-card">
+          <div className="summary-icon-box bg-blue-100 text-blue-600">
+            <Users size={20} />
+          </div>
+          <div className="summary-info">
+            <span className="summary-label">العمال المداومين (اليوم)</span>
+            <span className="summary-value">{summaryStats.workersCount}</span>
+          </div>
         </div>
-        <div className="filter-controls">
-          <div className="filter-group">
-            <label>التاريخ:</label>
-            <input 
-              type="date"
-              className="input-field select-field"
-              value={selectedDate}
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-                if (e.target.value) setSelectedMonth('all'); // reset month if exact date chosen
-              }}
-            />
+        
+        <div className="summary-card compact-card">
+          <div className="summary-icon-box bg-purple-100 text-purple-600">
+            <Clock size={20} />
           </div>
-          <div className="filter-group">
-            <label>الشهر الميلادي:</label>
-            <select 
-              className="input-field select-field"
-              value={selectedMonth}
-              onChange={(e) => {
-                setSelectedMonth(e.target.value);
-                if (e.target.value !== 'all') setSelectedDate(''); // reset exact date if month chosen
-              }}
-            >
-              <option value="all">جميع الأشهر</option>
-              {availableMonths.map(m => (
-                <option key={m} value={m}>{formatMonth(m)}</option>
-              ))}
-            </select>
+          <div className="summary-info">
+            <span className="summary-label">الساعات الإضافية (اليوم)</span>
+            <span className="summary-value">{summaryStats.extraHours} س</span>
           </div>
-          <div className="filter-group">
-            <label>تحديد العامل:</label>
-            <select 
-              className="input-field select-field"
-              value={selectedWorker}
-              onChange={(e) => setSelectedWorker(e.target.value)}
-            >
-              <option value="all">جميع العمال</option>
-              {workers.map(w => (
-                <option key={w.id} value={w.id}>{w.name}</option>
-              ))}
-            </select>
+        </div>
+
+        <div className="summary-card full-width-card production-summary-card">
+          <div className="summary-icon-box bg-green-100 text-green-600">
+            <Layers size={20} />
+          </div>
+          <div className="summary-info w-full">
+            <span className="summary-label">تفاصيل الإنتاج المنجز لليوم (مفصل بالمقاس)</span>
+            <div className="production-chips-container">
+              {summaryStats.productionDetails.length === 0 ? (
+                <span className="text-muted text-sm">لا يوجد إنتاج مسجل</span>
+              ) : (
+                summaryStats.productionDetails.map((item, idx) => (
+                  <div key={idx} className="prod-stat-chip">
+                    <span className="prod-stat-title">
+                      {item.workType} {item.productionType !== 'غير محدد' ? item.productionType : ''} <span className="prod-stat-size">({item.size})</span>
+                    </span>
+                    <span className="prod-stat-qty">
+                      {item.qty} {item.unit}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -199,8 +183,9 @@ export const ReportsList: React.FC = () => {
       </div>
 
       <div className="reports-table-container glass-panel">
-        <table className="reports-table">
-          <thead>
+        <div className="table-responsive" style={{ minHeight: '300px' }}>
+          <table className="reports-table">
+            <thead>
             <tr>
               <th>#</th>
               <th>التاريخ</th>
@@ -214,12 +199,12 @@ export const ReportsList: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredReports.length === 0 ? (
+            {reports.length === 0 ? (
               <tr>
-                <td colSpan={9} className="empty-state">لا توجد تقارير مطابقة لخيارات التصفية الحالية.</td>
+                <td colSpan={9} className="empty-state">لا توجد تقارير مسجلة بعد.</td>
               </tr>
             ) : (
-              filteredReports.map((report, index) => (
+              reports.map((report, index) => (
                 <React.Fragment key={report.id}>
                   {report.groups.map((group, gIndex) => (
                     group.productionItems.map((prod, pIndex) => (
@@ -227,7 +212,7 @@ export const ReportsList: React.FC = () => {
                         {/* Only show Report ID and Date on the first row of the report */}
                         {(gIndex === 0 && pIndex === 0) ? (
                           <>
-                            <td data-label="#" rowSpan={report.groups.reduce((acc, g) => acc + g.productionItems.length, 0)}>{filteredReports.length - index}</td>
+                            <td data-label="#" rowSpan={report.groups.reduce((acc, g) => acc + g.productionItems.length, 0)}>{reports.length - index}</td>
                             <td data-label="التاريخ" rowSpan={report.groups.reduce((acc, g) => acc + g.productionItems.length, 0)}>{report.date}</td>
                           </>
                         ) : null}
@@ -279,6 +264,7 @@ export const ReportsList: React.FC = () => {
             )}
           </tbody>
         </table>
+        </div>
 
         {/* Print Footer - Only visible when printing */}
         <div className="print-only-footer">

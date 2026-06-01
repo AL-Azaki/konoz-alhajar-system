@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import './Modal.css';
 
@@ -30,7 +31,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div 
         className={`modal-content modal-${maxWidth}`}
@@ -51,6 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

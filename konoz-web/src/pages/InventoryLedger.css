@@ -1,0 +1,322 @@
+.ledger-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Print Header - Hidden by default */
+.print-header {
+  display: none;
+}
+
+.filters-card {
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+
+.filters-header svg {
+  color: var(--color-primary);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  align-items: end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper .search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+.search-input-wrapper .form-input {
+  padding-right: 2.5rem;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+}
+
+.ledger-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: right;
+}
+
+.ledger-table th {
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.ledger-table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.tx-row:last-child td {
+  border-bottom: none;
+}
+
+.tx-row:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* Row Highlights */
+.row-in {
+  border-right: 3px solid #22c55e;
+}
+
+.row-out {
+  border-right: 3px solid #ef4444;
+}
+
+/* Badges */
+.tx-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-in {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.badge-out {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.tx-date {
+  font-weight: 600;
+  color: var(--color-text-main);
+  white-space: nowrap;
+}
+
+.tx-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.item-work {
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.item-prod {
+  color: var(--color-text-muted);
+}
+
+.item-size {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.tx-qty {
+  font-weight: 700;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.text-success {
+  color: #16a34a;
+}
+
+.text-danger {
+  color: #dc2626;
+}
+
+.recipient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.recipient-info strong {
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+}
+
+.driver-name, .truck-info {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.tx-notes {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  max-width: 250px;
+}
+
+.empty-state {
+  padding: 3rem !important;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+/* =========================================
+   PRINT STYLES (Professional ERP Layout)
+   ========================================= */
+@media print {
+  /* Hide unnecessary elements */
+  .sidebar,
+  .top-bar,
+  .no-print,
+  .mobile-menu-btn,
+  .theme-toggle-btn {
+    display: none !important;
+  }
+
+  /* Reset layout for printing */
+  body, html {
+    background: white !important;
+    color: black !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .layout-container, .main-content, .content-area {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .ledger-page {
+    gap: 0;
+  }
+
+  /* Show Print Header */
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #000;
+  }
+
+  .print-company-info h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #000;
+  }
+
+  .print-company-info p {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    color: #333;
+  }
+
+  .print-report-title {
+    text-align: left;
+  }
+
+  .print-report-title h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    color: #000;
+  }
+
+  .print-report-title p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  /* Table Adjustments for Print */
+  .table-container {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .ledger-table {
+    border-collapse: collapse;
+  }
+
+  .ledger-table th {
+    background-color: #f3f4f6 !important;
+    color: #000 !important;
+    border: 1px solid #ddd;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .ledger-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    color: #000;
+  }
+
+  .tx-badge {
+    background: transparent !important;
+    padding: 0;
+    border: none;
+  }
+
+  .badge-in {
+    color: #000 !important;
+  }
+  
+  .badge-out {
+    color: #000 !important;
+  }
+
+  .row-in, .row-out {
+    border-right: none;
+  }
+
+  .text-success, .text-danger {
+    color: #000 !important;
+  }
+
+  /* Force page breaks if needed */
+  tr {
+    page-break-inside: avoid;
+  }
+}
